@@ -1,0 +1,51 @@
+Blackjack Rules and other details
+
+
+Player competes against the house
+Objective : Hand total closer to 21 than the dealer without going over 21 (busting)
+Players and dealer receive 2 cards each 
+Player’s card face up
+Dealer has one face up other face down (hole card)
+
+Equipment
+
+Standart internacional deck without the Jokers  - 52 cards
+Single, double , 4, 6, 8 deck combination 
+Cut card - used to cut the shuffled deck 
+
+Card values
+
+Ace - 1 or 11
+Numerical card - it’s own number value 
+Jacks,Queens,Kings - 10
+
+Hands with Ace valued at 11 - Soft hand
+Any other - Hard hand
+A combination making 21 (with Ace and a 10 valued card)- Blackjack
+
+Order of Play and Playing Options
+
+Betting values : minimum 1:(40 to 100) maximum  
+
+Player places the bet
+Dealer deals the cards face up one at a time clockwise to each betting player
+A card face up to the dealer
+Dealer deals again a card face up to each player 
+A card face down for the dealer
+
+If the dealer has a 10 or a Ace - players can place a Insurance bet - half the current bet.
+Insurance bet is won if dealer has a Blackjack
+
+Stand - no further action
+Hit - one more card 
+Double down - if the player has a favourable hand it may want to place a second 
+Split -  if the players 2 cards are the same value it can separate into two hands with each individual bet. Max  splitting is four hands.
+From a split no blackjack can be obtained but just a ordinary 21
+Surrender - first action after dealt cards ( if dealer does not have a Blackjack ) retakes half the bet
+
+Payout 
+
+Equal than dealer - bets returns
+Player wins - normal hand 1:1
+Blackjack - 3:2
+Insurance - 2:1
