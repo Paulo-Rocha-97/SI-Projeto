@@ -49,20 +49,23 @@ def td_0(env,num,alpha,gamma):
         
         S_t = env.reset()
         
-        done = False
-        
-        while not done:
+        while True:
             
             action = policy(S_t)  
             
             S_t_1, R_t , done = game_step(action)
-
+            
             if done:
-                V[S_t_1] = float(0) 
-
-            V[S_t] = V[S_t] + alpha*(R_t + gamma*V[S_t_1] - V[S_t])
+                V_next=0
+            else:
+                V_next=V[S_t_1]
+                
+            V[S_t] = V[S_t] + alpha*(R_t + gamma*V_next - V[S_t])
             
             S_t = S_t_1
+            
+            if done:
+                break
             
     return V
             
@@ -70,10 +73,9 @@ def td_0(env,num,alpha,gamma):
 
 num=1
 
-gamma=0.5
+gamma=1
 
-alpha=0
-
+alpha=0.05
 V = td_0(env,int(num*1000000),alpha,gamma)
 
 Data={}
