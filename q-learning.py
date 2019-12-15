@@ -1,5 +1,7 @@
+import os
 import gym
-import numpy as np
+import shutil
+import numpy as np 
 import scipy.io as sio
 from tqdm import tqdm
 from collections import defaultdict
@@ -54,10 +56,6 @@ def game_step(action):
     
     state_linha, reward, done, _ = env.step(action)
     
-    state_linha = list(state_linha) 
-    del state_linha[2]
-    state_linha = tuple(state_linha)
-    
     return state_linha, reward, done 
 
 #%%########################################################################### 
@@ -83,13 +81,9 @@ def q_learning(env,numero,alpha,gamma):
     for i in tqdm(range(numero)):
         C = probability (numero,i)
         S_t = env.reset()
-        
-        S_t = list(S_t)
-        del S_t[2]
-        S_t = tuple(S_t)
-        
+                
         done = False
-        
+                
         while not done:
             
             action = policy(S_t,P,C)
@@ -112,6 +106,11 @@ def q_learning(env,numero,alpha,gamma):
            
             if done:
                 Q_max = 0
+            else:
+                if Q[ID_hit] > Q[ID_stick]:
+                    Q_max = Q[ID_hit]
+                else:
+                    Q_max = Q[ID_stick]
             
             Q[ID] = Q[ID] + alpha*(R_t + gamma*Q_max - Q[ID])
             
@@ -123,22 +122,34 @@ def q_learning(env,numero,alpha,gamma):
             S_t = S_t_linha
             
                 
-    return Q
+    return Q ,P
 #%%########################################################################
-Q = q_learning(env,5000000,0.1,0.8)
+num=0.5
+
+gamma=0.8
+
+alpha=0.1
+
+Q, P= q_learning(env,int(num*1000000),alpha,gamma)
 
 Data = {}
 
 Q_=convert_to_matlab(Q)
+P_=convert_to_matlab(P)
+
 
 Data['Q'] = dict(Q_)
+Data['Policy'] = dict(P_)
+   
+filename = f'{num}_Q_a_{alpha}_g_{gamma}.mat'
 
-filename = input('Done\nFilename:')
+dr = os.getcwd() +'\Matlab\Dados'
 
-if filename !='':
-    name = filename+'.mat'
-                     
-    sio.savemat(name,Data)      
+sio.savemat(filename,Data)
+
+shutil.move(filename,dr)
+
+               
         
         
         

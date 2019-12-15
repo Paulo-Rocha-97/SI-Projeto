@@ -1,5 +1,7 @@
+import os
 import gym
-import numpy as np
+import shutil
+import numpy as np 
 import scipy.io as sio
 from tqdm import tqdm
 from collections import defaultdict
@@ -36,11 +38,11 @@ def probability (numero,i):
 ### this function creates a decreasing probability of exploring - linear stops at 90% ###
 
     #parameterization of a exp
-    c = - np.log(0.15) / 0.9 * (numero)
+    c = - np.log(0.2) / 0.9 * (numero)
     if i < numero:
         eps = np.exp(-c*i)
     else:
-        eps = 0.1
+        eps = 0.2
     explore = eps/2
     
     exploit = 1 - eps
@@ -53,10 +55,6 @@ def probability (numero,i):
 def game_step(action):
     
     state_linha, reward, done, _ = env.step(action)
-    
-    state_linha = list(state_linha) 
-    del state_linha[2]
-    state_linha = tuple(state_linha)
     
     return state_linha, reward, done 
 
@@ -81,12 +79,10 @@ def sarsa_learning(env,numero,alpha,gamma):
     P = defaultdict(int)
 
     for i in tqdm(range(numero)):
-        C = probability (numero,i)
-        S_t = env.reset()
         
-        S_t = list(S_t)
-        del S_t[2]
-        S_t = tuple(S_t)
+        C = probability (numero,i)
+        
+        S_t = env.reset()
         
         done = False
         
@@ -106,15 +102,17 @@ def sarsa_learning(env,numero,alpha,gamma):
             
             ID = tuple(S + A)
             
-            ID_stick = tuple(S + [0])
+            ID_stick = tuple(S+ [0])
             ID_hit = tuple(S + [1])
 
             ID_linha = tuple(S_linha + A_linha)
                        
             if done:
-                Q[ID_linha] = float(0)
+                Q_next = 0
+            else:
+                Q_next = Q[ID_linha]
             
-            Q[ID] = Q[ID] + alpha*(R_t + gamma*Q[ID_linha] - Q[ID])
+            Q[ID] = Q[ID] + alpha*(R_t + gamma*Q_next - Q[ID])
             
             if Q[ID_stick] > Q[ID_hit]:
                 P[S_t] = 0
@@ -124,20 +122,29 @@ def sarsa_learning(env,numero,alpha,gamma):
             S_t = S_t_linha
             action = action_linha
                 
-    return Q
+    return Q,P
 #%%########################################################################
-Q = sarsa_learning(env,500000,0.1,0.8)
+num = 2
+
+alpha = 0.01
+
+gamma = 1
+
+Q,P = sarsa_learning(env,int(num*1000000),alpha,gamma)
 
 Data = {}
 
 Q_=convert_to_matlab(Q)
+P_=convert_to_matlab(P)
 
 Data['Q'] = dict(Q_)
+Data['Policy'] = dict(P_)
 
-filename = input('Done\nFilename:')
+filename = f'{num}_sarsa_a_{alpha}_g_{gamma}.mat'
 
-if filename !='':
-    name = filename+'.mat'
-                     
-    sio.savemat(name,Data) 
+dr = os.getcwd() +'\Matlab\Dados'
+
+sio.savemat(filename,Data)
+
+shutil.move(filename,dr)
 
