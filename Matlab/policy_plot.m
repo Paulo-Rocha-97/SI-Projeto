@@ -13,7 +13,7 @@ for i = 1 : length(valores)
     
     if strcmp(var{4},' False')
         
-        if str2num(var{2})>10 
+        if str2num(var{2})>10 && str2num(var{3})<11 && str2num(var{2})<22
             
             X_no(Cont_no) = str2num(var{2});
             Y_no(Cont_no) = str2num(var{3});
@@ -23,7 +23,7 @@ for i = 1 : length(valores)
            
         end
     else
-        if str2num(var{2})>10
+        if str2num(var{2})>10 && str2num(var{3})<11 && str2num(var{2})<22
             
             X(Cont_yes) = str2num(var{2});
             Y(Cont_yes) = str2num(var{3});
@@ -37,33 +37,37 @@ end
 comp = Cont_yes-1;
 comp_no = Cont_no-1;
 
-figure (5)
+figure 
 subplot(1,2,1)
-title('Usable Ace')
 for i = 1:comp 
     
     if Z(i)==1
-        plot (Y(i),X(i),'ob')
+       a = plot (Y(i),X(i),'ob');
     else
-        plot (Y(i),X(i),'or')
+       b = plot (Y(i),X(i),'or');
     end
     hold on
 end
+xlabel("Dealer's card")
+ylabel("Player's hand")
+legend([a(1),b(1)],'Hit','Skip')
 title('Usable Ace')
 hold off
 
 subplot(1,2,2)
-title('No Usable Ace')
 for i = 1:comp_no 
     
     if Z_no(i)==1
-        plot (Y_no(i),X_no(i),'ob')
+       a_n = plot (Y_no(i),X_no(i),'ob');
     else
-        plot (Y_no(i),X_no(i),'or')
+       b_n = plot (Y_no(i),X_no(i),'or');
     end
     hold on
 end
+xlabel("Dealer's card")
+ylabel("Player's hand")
 title('No Usable Ace')
+legend([a_n(1),b_n(1)],'Hit','Skip')
 hold off
 
 

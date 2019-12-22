@@ -1,98 +1,86 @@
 import os
 import gym
 import shutil
-import numpy as np 
+from numpy.random import choice
+import Test_policy as tp
 import scipy.io as sio
 from tqdm import tqdm
 from collections import defaultdict
 
 env=gym.make('Blackjack-v0')
 
-#%%###########################################################################
-def policy (state,poli,C):
-    
-### this function decides based on a policy vector which action to take###
-    
-    state=list(state)
-    
-    if state[0] < 11:  # value benneath which it does not make sense other action 
-        action = 1
-        
-    else:
-        
-        if C == 2:
-                
-            state = tuple(state) 
-            action = poli[state] # action following the policy defined
-            
-        else:
-            
-            action = C  
-        
-    #action = env.action_space.sample()
-    
-    return action
-#%%###########################################################################
-def probability (numero,i):
-    
-### this function creates a decreasing probability of exploring - linear stops at 90% ###
 
-    #parameterization of a exp
-    c = - np.log(0.2) / 0.9 * (numero)
-    if i < numero:
-        eps = np.exp(-c*i)
-    else:
-        eps = 0.2
-    explore = eps/2
-    
-    exploit = 1 - eps
-    
-    chosen = np.random.choice([0,1,2],1,p=[explore,explore,exploit]) # select if it should explore or exploit
-    chosen = int(chosen)
-            
-    return chosen
 #%%###########################################################################
-def game_step(action):
+
+def target_policy_creation():
+
+    ### This function creates a target policy - hit until 20 or 21 ###
+
+    T=defaultdict(float)
     
-    state_linha, reward, done, _ = env.step(action)
+    ace = [ False , True ]
     
-    return state_linha, reward, done 
+    for i in range (2,32):
+        for j in range (2,32):
+            for w in ace:
+                
+                ID = tuple([i,j,w])
+                
+                T[ID] = [0.5,0.5]
+    return T
 
 #%%########################################################################### 
 
-def convert_to_matlab(V):
+def convert_to_matlab(X):
     
-    V_ = defaultdict(float)
+    X_ = defaultdict(float)
 
-    for key in V.keys():
+    for key in X.keys():
         
         Key_str = str(key)
         
-        V_[Key_str] = V[key]
+        X_[Key_str] = X[key]
         
+    return X_
+
+#%%########################################################################### 
+
+def convert_from_prob(P):
+    
+    P_=defaultdict(int)
+    
+    for key in P.keys():
+                
+        if P[key][0]>P[key][1]:
+            P_[key] = 0
+        else:
+            P_[key] = 1
         
-    return V_
+    return P_
     
 #%%###########################################################################
 def sarsa_learning(env,numero,alpha,gamma):
+    
     Q = defaultdict(float)
-    P = defaultdict(int)
+    P = target_policy_creation()
+
+    eps = 0.15;
+    
+    R = []
 
     for i in tqdm(range(numero)):
-        
-        C = probability (numero,i)
-        
+                
         S_t = env.reset()
         
         done = False
         
-        action = policy(S_t,P,C)
+        action = int(choice([0,1],1,p=P[S_t]))
         
         while not done:
             
-            S_t_linha, R_t , done = game_step(action)
-            
-            action_linha = policy(S_t_linha,P,C)
+            S_t_linha, R_t , done, _ = env.step(action)
+                        
+            action_linha = int(choice([0,1],1,p=P[S_t_linha]))
             
             S = list(S_t)
             S_linha = list(S_t_linha)
@@ -109,38 +97,47 @@ def sarsa_learning(env,numero,alpha,gamma):
                        
             if done:
                 Q_next = 0
+                R.append(R_t)
             else:
                 Q_next = Q[ID_linha]
             
             Q[ID] = Q[ID] + alpha*(R_t + gamma*Q_next - Q[ID])
             
             if Q[ID_stick] > Q[ID_hit]:
-                P[S_t] = 0
+                P[S_t]=[1 - eps + eps/2, eps/2]
             else:
-                P[S_t] = 1
+                P[S_t]=[eps/2, 1 - eps + eps/2]
             
             S_t = S_t_linha
             action = action_linha
                 
-    return Q,P
+    return Q,P,R
 #%%########################################################################
-num = 2
+num = 1
 
-alpha = 0.01
+alpha = 0.005
 
 gamma = 1
 
-Q,P = sarsa_learning(env,int(num*1000000),alpha,gamma)
+Q,P,R = sarsa_learning(env,int(num*1000000),alpha,gamma)
+
+P1=convert_from_prob(P)
+
+R_val, R_nl = tp.run_test_policy(P1,0.1)
 
 Data = {}
 
-Q_=convert_to_matlab(Q)
-P_=convert_to_matlab(P)
+Q_ = convert_to_matlab (Q)
+
+P_ = convert_to_matlab(P1)
 
 Data['Q'] = dict(Q_)
 Data['Policy'] = dict(P_)
+Data['R'] = list(R)
+Data['R_total'] = R_val
+Data['R_n_l'] = R_nl
 
-filename = f'{num}_sarsa_a_{alpha}_g_{gamma}.mat'
+filename = f'{num}_sarsa_ideal_a_{alpha}_g_{gamma}.mat'
 
 dr = os.getcwd() +'\Matlab\Dados'
 

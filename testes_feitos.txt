@@ -1,0 +1,119 @@
+---MC - policy evaluation----
+
+---------------------------
+
+10 k policy evaluation - std 
+	- 23543 it/s
+	- < 4 s
+100 k policy evaluation -std
+	- 23474 it/s
+	- 4 s
+1M policy evaluation -std
+	- 22157 it/s
+	- 45 s
+
+Vitorias - 29%
+viotrias + empates - 35%
+
+---------------------------
+
+100k policy evaluation -hit unless 19,20,21
+	- 22061. it/s
+	- 4 s
+
+Vitorias - 35%
+viotrias + empates - 46%
+
+-----MC - on policy control------ 
+
+100k - policy - eps - 0.15_G_1
+	- 4301 it/s 	
+	- 23s
+
+Vitorias - 42.5%
+viotrias + empates - 52%
+
+---------------------------
+
+500k - policy - eps - 0.15_G_1
+	- 1874 it/s 	
+	- 4:26 
+
+Vitorias - 42.5%
+viotrias + empates - 52%
+
+---------------------------
+
+500k - policy - eps - exp - 0.15 G_1
+	- 2614.	 it/s 	
+	- 03:11 
+
+Vitorias - 42.65%
+viotrias + empates - 51%
+
+---------------------------
+
+1M - policy - eps - 0.15
+	- 900 it/s 	
+	- 18:30 
+
+Vitorias - 43.1%
+viotrias + empates - 52%
+
+---------------------------
+
+1M - policy - eps - 0.15 gamma 0
+	- 870 it/s 	
+	- 19:08 
+
+Vitorias - 43%
+viotrias + empates - 52%
+
+
+---------------------------
+
+1M - policy - eps - 0.15 gamma 0.5
+	- 953 it/s 	
+	- 17:28 
+
+Vitorias - 43%
+viotrias + empates - 52%
+
+---------------------------
+
+2.5M - policy - eps - 0.15 gamma 1
+	- 1164 it/s 	
+	- 35:47 
+
+Vitorias - 43 %
+viotrias + empates - 52%
+
+---------------------------
+
+2.5M - policy - eps - 0.15 gamma 0.85
+	- 1164 it/s 	
+	- 35:47 
+
+Vitorias - 43 %
+viotrias + empates - 52%
+
+5M - policy - eps - 0.15 gamma 1
+	- 1164 it/s 	
+	- 35:47 
+
+Vitorias - 43 %
+viotrias + empates - 52%
+
+-----MC - off policy ------ 
+
+2M - off policy - B 50% 50%
+	- 8977 it/s
+	- 03:42
+
+Vitorias - 43 %
+viotrias + empates - 52%
+
+
+
+
+

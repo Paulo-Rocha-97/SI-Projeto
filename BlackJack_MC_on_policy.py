@@ -6,7 +6,7 @@
 import os
 import gym
 import shutil 
-import numpy as np
+from numpy.random import choice
 import Test_policy as tp
 import scipy.io as sio
 from tqdm import tqdm
@@ -37,7 +37,6 @@ def target_policy_creation():
 
 #%%#############################################################################
 
-
 def convert_to_matlab(Q,T_P):
     
     Q_ = defaultdict(float)
@@ -59,13 +58,18 @@ def convert_to_matlab(Q,T_P):
 
 #%%#############################################################################
 
-def policy (state,P):
+def convert_from_prob(P):
     
-### this function decides based on a policy vector which action to take###
+    P_=defaultdict(int)
+    
+    for key in P.keys():
+                
+        if P[key][0]>P[key][1]:
+            P_[key] = 0
+        else:
+            P_[key] = 1
         
-    action = int(np.random.choice([0,1],1,p=P[state]))
-    
-    return action  
+    return P_
 
 #%%#############################################################################
 
@@ -84,7 +88,7 @@ def game(env,states,actions,rewards,poli):
         
         states.append(state) # save state prior to game
         
-        action = policy(state,poli) # define action based on a given policy
+        action = int(choice([0,1],1,p=P[state])) # define action based on a given policy
         
         actions.append(action) # save action taken 
                 
@@ -114,22 +118,15 @@ def first_visit_MC(numero,env,gamma):
         actions = []
         rewards = []
         G = 0 
-            
-# =============================================================================
-#         c = - np.log(0.1) / ( 0.9 * (numero) )
-#         if i < numero:
-#             eps = np.exp(-c*i)
-#         else:
-# =============================================================================
+        
         eps = 0.15
-            
+        
         states,actions,rewards = game(env,states,actions,rewards,P)
         
         comp = (len(states))-1
         
         for j in range(comp,-1,-1): # run for every instance of an episode
         
-    
             S_t = states[j]  # state to consider 
             R_t = rewards[j]
             A_t = actions[j]  # correspondent action
@@ -138,52 +135,30 @@ def first_visit_MC(numero,env,gamma):
             A = [A_t]
             
             ID = tuple( S + A ) # associate state with action
-                    
+            
             A = tuple ( S + [0] )  # state com acção 0
             B = tuple ( S + [1] )  # states com acção 1
                         
             G = gamma*G + R_t # sum of rewards from each state and 
-                                      
-            if S_t not in states[:j]:
+            
+            Returns[ID].append(G)
+            
+            Q[ID] = (sum(Returns[ID]))/(len(Returns[ID]))
+            
+            if Q [A] > Q[B]:
+                P[S_t]=[1 - eps + eps/2, eps/2]
+            else:
+                P[S_t]=[eps/2, 1 - eps + eps/2]
                 
-                Returns[ID].append(G)
-                                              
-                Q[ID] = np.average(Returns[ID])
-                                
-                if Q [A] > Q[B]:
-                    A__ = 0
-                else:
-                    A__ = 1
-                    
-                if A__ == 0:
-                    P[S_t]=[1 - eps + eps/2, eps/2]
-                else:
-                    P[S_t]=[eps/2, 1 - eps + eps/2]
-                    
         R.append(sum(rewards))
                     
     return Q , P , R 
 
 #%%#############################################################################
-
-def convert_from_prob(P):
     
-    P_=defaultdict(int)
-    
-    for key in P.keys():
-                
-        if P[key][0]>P[key][1]:
-            P_[key] = 0
-        else:
-            P_[key] = 1
-        
-    return P_
+num = 2.5
 
-#%%#############################################################################
-    
-num = 1
-
-gamma = 0
+gamma = 0.85
 
 Q , P , R  = first_visit_MC(int(num*1000000),env,gamma)
 
