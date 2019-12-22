@@ -21,7 +21,7 @@ def target_policy_creation():
     ace = [ False , True ]
     
     for i in range (2,32):
-        for j in range (2,32):
+        for j in range (1,10):
             for w in ace:
                 
                 ID = tuple([i,j,w])
