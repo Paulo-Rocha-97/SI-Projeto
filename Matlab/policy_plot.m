@@ -13,7 +13,7 @@ for i = 1 : length(valores)
     
     if strcmp(var{4},' False')
         
-        if str2num(var{2})>10 && str2num(var{3})<11 && str2num(var{2})<22
+        if str2num(var{2})>10 && str2num(var{2})<22
             
             X_no(Cont_no) = str2num(var{2});
             Y_no(Cont_no) = str2num(var{3});
@@ -23,7 +23,7 @@ for i = 1 : length(valores)
            
         end
     else
-        if str2num(var{2})>10 && str2num(var{3})<11 && str2num(var{2})<22
+        if str2num(var{2})>10 && str2num(var{2})<22
             
             X(Cont_yes) = str2num(var{2});
             Y(Cont_yes) = str2num(var{3});
